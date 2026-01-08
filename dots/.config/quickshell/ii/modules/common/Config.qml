@@ -455,6 +455,7 @@ Singleton {
             property JsonObject resources: JsonObject {
                 property int updateInterval: 3000
                 property int historyLength: 60
+                property string thermalPath: "/sys/class/thermal/thermal_zone0/temp"
             }
 
             property JsonObject tray: JsonObject {

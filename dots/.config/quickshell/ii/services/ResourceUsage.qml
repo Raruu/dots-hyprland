@@ -21,6 +21,8 @@ Singleton {
     property real swapUsedPercentage: swapTotal > 0 ? (swapUsed / swapTotal) : 0
     property real cpuUsage: 0
     property var previousCpuStats
+    property real cpuTemperature: 0
+    property real cpuFreqency: 0
 
     property string maxAvailableMemoryString: kbToGbString(ResourceUsage.memoryTotal)
     property string maxAvailableSwapString: kbToGbString(ResourceUsage.swapTotal)
@@ -67,6 +69,8 @@ Singleton {
             // Reload files
             fileMeminfo.reload()
             fileStat.reload()
+            fileThermal.reload()
+            fileCpuinfo.reload()
 
             // Parse memory and swap usage
             const textMeminfo = fileMeminfo.text()
@@ -92,6 +96,16 @@ Singleton {
                 previousCpuStats = { total, idle }
             }
 
+            // CPU temperature
+            const cpuThermal = fileThermal.text()
+            cpuTemperature = Number(cpuThermal) / 1000
+
+            // CPU frequency
+            const cpuInfo = fileCpuinfo.text();
+            const cpuCoreFrequencies = cpuInfo.match(/cpu MHz\s+:\s+(\d+\.\d+)\n/g).map(x => Number(x.match(/\d+\.\d+/)));
+            const cpuCoreFreqencyAvg = cpuCoreFrequencies.reduce((a, b) => a + b, 0) / cpuCoreFrequencies.length;
+            cpuFreqency = cpuCoreFreqencyAvg / 1000;
+
             root.updateHistories()
             interval = Config.options?.resources?.updateInterval ?? 3000
         }
@@ -99,6 +113,8 @@ Singleton {
 
 	FileView { id: fileMeminfo; path: "/proc/meminfo" }
     FileView { id: fileStat; path: "/proc/stat" }
+    FileView { id: fileThermal; path: Config.options?.resources?.thermalPath ?? "/sys/class/thermal/thermal_zone0/temp" }
+    FileView { id: fileCpuinfo; path: "/proc/cpuinfo" }
 
     Process {
         id: findCpuMaxFreqProc

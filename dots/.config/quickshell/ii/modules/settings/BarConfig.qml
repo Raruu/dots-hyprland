@@ -347,4 +347,18 @@ ContentPage {
             }
         }
     }
+
+    ContentSection {
+        icon: "memory"
+        title: Translation.tr("Resources")
+        
+        MaterialTextArea {
+            Layout.fillWidth: true
+            text: Config.options.resources.thermalPath
+            placeholderText: "CPU thermal sensor path"
+            onTextChanged: {
+                Config.options.resources.thermalPath = text;
+            }
+        }
+    }
 }
