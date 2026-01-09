@@ -15,6 +15,7 @@ Item {
     required property var panelWindow
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(panelWindow.screen)
     property var windowByAddress: HyprlandData.windowByAddress
+    property bool isShowing: true
 
     // Background blur/dim settings
     property real padding: 40
@@ -214,6 +215,7 @@ Item {
             windowData: root.windowByAddress[address]
             monitorData: HyprlandData.monitors.find(m => m.id === windowData?.monitor)
             scale: 1 // We want 1:1 scale for previews in the grid
+            isShowing: root.isShowing
 
             widgetMonitor: HyprlandData.monitors.find(m => m.id === root.monitor.id)
 

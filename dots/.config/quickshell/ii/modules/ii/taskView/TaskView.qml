@@ -6,6 +6,7 @@ import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import qs.modules.common.widgets
 
 Scope {
     id: taskViewScope
@@ -19,11 +20,11 @@ Scope {
             readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.screen)
             screen: modelData
 
-            visible: GlobalStates.taskViewOpen
+            visible: fadeRoot.opacity > 0 || GlobalStates.taskViewOpen
 
             WlrLayershell.namespace: "quickshell:taskview"
             // WlrLayershell.layer: WlrLayer.Overlay
-            // WlrLayershell.exclusiveZone: -1 // Cover everything
+            WlrLayershell.exclusiveZone: Config.options.bar.cornerStyle === 1 ? -1 : 0 // Cover everything
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
             color: "transparent"
@@ -38,17 +39,24 @@ Scope {
             // Wallpaper Background to hide actual windows
             property bool wallpaperIsVideo: Config.options.background.wallpaperPath.endsWith(".mp4") || Config.options.background.wallpaperPath.endsWith(".webm") || Config.options.background.wallpaperPath.endsWith(".mkv") || Config.options.background.wallpaperPath.endsWith(".avi") || Config.options.background.wallpaperPath.endsWith(".mov")
             property string wallpaperPath: wallpaperIsVideo ? Config.options.background.thumbnailPath : Config.options.background.wallpaperPath
-
+            property bool showBarBackground: Config.options.bar.showBackground
+            
             Item {
                 id: fadeRoot
                 anchors.fill: parent
-
+                focus: true    
                 opacity: GlobalStates.taskViewOpen ? 1 : 0
                 enabled: opacity > 0
+                
+                onActiveFocusChanged: {
+                    if (!activeFocus && GlobalStates.taskViewOpen) {
+                        GlobalStates.taskViewOpen = false;
+                    }
+                }
 
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: 100
+                        duration: 150
                         easing.type: Easing.InOutQuad
                     }
                 }
@@ -77,8 +85,8 @@ Scope {
                 GaussianBlur {
                     anchors.fill: bgWallpaper
                     source: bgWallpaper
-                    radius: 30
-                    samples: 16
+                    radius: 100
+                    samples: radius * 2 + 1
                     z: -1
 
                     // Dimming layer
@@ -92,6 +100,77 @@ Scope {
                 TaskViewWidget {
                     anchors.fill: parent
                     panelWindow: root
+                    isShowing: fadeRoot.opacity > 0
+                }
+
+                // Round decorators
+                Loader {
+                    id: roundDecorators
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: barContent.bottom
+                        bottom: undefined
+                    }
+                    height: Appearance.rounding.screenRounding
+                    active: showBarBackground && Config.options.bar.cornerStyle === 0 // Hug
+
+                    states: State {
+                        name: "bottom"
+                        when: Config.options.bar.bottom
+                        AnchorChanges {
+                            target: roundDecorators
+                            anchors {
+                                right: parent.right
+                                left: parent.left
+                                top: undefined
+                                bottom: barContent.top
+                            }
+                        }
+                    }
+
+                    sourceComponent: Item {
+                        implicitHeight: Appearance.rounding.screenRounding
+                        RoundCorner {
+                            id: leftCorner
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                left: parent.left
+                            }
+
+                            implicitSize: Appearance.rounding.screenRounding
+                            color: showBarBackground ? Appearance.colors.colLayer0 : "transparent"
+
+                            corner: RoundCorner.CornerEnum.TopLeft
+                            states: State {
+                                name: "bottom"
+                                when: Config.options.bar.bottom
+                                PropertyChanges {
+                                    leftCorner.corner: RoundCorner.CornerEnum.BottomLeft
+                                }
+                            }
+                        }
+                        RoundCorner {
+                            id: rightCorner
+                            anchors {
+                                right: parent.right
+                                top: !Config.options.bar.bottom ? parent.top : undefined
+                                bottom: Config.options.bar.bottom ? parent.bottom : undefined
+                            }
+                            implicitSize: Appearance.rounding.screenRounding
+                            color: showBarBackground ? Appearance.colors.colLayer0 : "transparent"
+
+                            corner: RoundCorner.CornerEnum.TopRight
+                            states: State {
+                                name: "bottom"
+                                when: Config.options.bar.bottom
+                                PropertyChanges {
+                                    rightCorner.corner: RoundCorner.CornerEnum.BottomRight
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Key handling to close (Escape) or navigate (Arrows - TODO)

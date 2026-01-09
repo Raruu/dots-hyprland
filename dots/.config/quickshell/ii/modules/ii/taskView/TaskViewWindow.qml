@@ -17,6 +17,7 @@ Item { // Window
     property var windowData
     property var monitorData
     property var scale
+    property bool isShowing: true
     property real widthRatio: {
         const widgetWidth = widgetMonitor.transform & 1 ? widgetMonitor.height : widgetMonitor.width;
         const monitorWidth = monitorData.transform & 1 ? monitorData.height : monitorData.width;
@@ -85,7 +86,7 @@ Item { // Window
     }
  
     // Rounded corners
-    property real radius: Appearance.rounding.medium
+    property real radius: Appearance.rounding.normal
 
     layer.enabled: true
     layer.effect: OpacityMask {
@@ -99,7 +100,7 @@ Item { // Window
     ScreencopyView {
         id: windowPreview
         anchors.fill: parent
-        captureSource: GlobalStates.taskViewOpen ? root.toplevel : null
+        captureSource: root.isShowing ? root.toplevel : null
         live: true
 
         // Color overlay for interactions
@@ -173,7 +174,7 @@ Item { // Window
             anchors.fill: parent
             radius: parent.buttonRadius
             color: Appearance.colors.colError
-            opacity: 0.8
+            opacity: 1
         }
 
         contentItem: MaterialSymbol {
