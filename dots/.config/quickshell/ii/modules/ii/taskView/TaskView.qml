@@ -22,8 +22,8 @@ Scope {
             visible: GlobalStates.taskViewOpen
 
             WlrLayershell.namespace: "quickshell:taskview"
-            WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.exclusiveZone: -1 // Cover everything
+            // WlrLayershell.layer: WlrLayer.Overlay
+            // WlrLayershell.exclusiveZone: -1 // Cover everything
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
             color: "transparent"
@@ -35,57 +35,72 @@ Scope {
                 right: true
             }
 
-            // Close when clicking empty space
-            MouseArea {
-                anchors.fill: parent
-                onClicked: GlobalStates.taskViewOpen = false
-            }
-
             // Wallpaper Background to hide actual windows
             property bool wallpaperIsVideo: Config.options.background.wallpaperPath.endsWith(".mp4") || Config.options.background.wallpaperPath.endsWith(".webm") || Config.options.background.wallpaperPath.endsWith(".mkv") || Config.options.background.wallpaperPath.endsWith(".avi") || Config.options.background.wallpaperPath.endsWith(".mov")
             property string wallpaperPath: wallpaperIsVideo ? Config.options.background.thumbnailPath : Config.options.background.wallpaperPath
 
-            // Solid background fallback
-            Rectangle {
+            Item {
+                id: fadeRoot
                 anchors.fill: parent
-                color: Appearance.colors.colLayer1 // Use theme background color
-                z: -2
-            }
 
-            Image {
-                id: bgWallpaper
-                anchors.fill: parent
-                source: root.wallpaperPath
-                fillMode: Image.PreserveAspectCrop
-                visible: false // Hidden, used as source for blur
-            }
+                opacity: GlobalStates.taskViewOpen ? 1 : 0
+                enabled: opacity > 0
 
-            GaussianBlur {
-                anchors.fill: bgWallpaper
-                source: bgWallpaper
-                radius: 30
-                samples: 16
-                z: -1
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 100
+                        easing.type: Easing.InOutQuad
+                    }
+                }
 
-                // Dimming layer
+                // Close when clicking empty space
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: GlobalStates.taskViewOpen = false
+                }
+
+                // Solid background fallback
                 Rectangle {
                     anchors.fill: parent
-                    color: Qt.rgba(0, 0, 0, 0.4)
+                    color: Appearance.colors.colLayer1 // Use theme background color
+                    z: -2
                 }
-            }
 
-            // The actual content
-            TaskViewWidget {
-                anchors.fill: parent
-                panelWindow: root
-            }
+                Image {
+                    id: bgWallpaper
+                    anchors.fill: parent
+                    source: root.wallpaperPath
+                    fillMode: Image.PreserveAspectCrop
+                    visible: false // Hidden, used as source for blur
+                }
 
-            // Key handling to close (Escape) or navigate (Arrows - TODO)
-            Item {
-                focus: true
-                Keys.onPressed: event => {
-                    if (event.key === Qt.Key_Escape) {
-                        GlobalStates.taskViewOpen = false;
+                GaussianBlur {
+                    anchors.fill: bgWallpaper
+                    source: bgWallpaper
+                    radius: 30
+                    samples: 16
+                    z: -1
+
+                    // Dimming layer
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Qt.rgba(0, 0, 0, 0.4)
+                    }
+                }
+
+                // The actual content
+                TaskViewWidget {
+                    anchors.fill: parent
+                    panelWindow: root
+                }
+
+                // Key handling to close (Escape) or navigate (Arrows - TODO)
+                Item {
+                    focus: true
+                    Keys.onPressed: event => {
+                        if (event.key === Qt.Key_Escape) {
+                            GlobalStates.taskViewOpen = false;
+                        }
                     }
                 }
             }

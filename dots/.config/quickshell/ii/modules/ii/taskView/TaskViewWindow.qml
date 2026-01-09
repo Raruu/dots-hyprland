@@ -42,6 +42,9 @@ Item { // Window
 
     property string iconPath: Quickshell.iconPath(AppSearch.guessIcon(windowData?.class), "image-missing")
 
+    // Reset animation
+    property bool enableAnimation: GlobalStates.taskViewOpen
+
     // Animate position and size
     x: targetX
     y: targetY
@@ -49,30 +52,38 @@ Item { // Window
     height: targetHeight
 
     Behavior on x {
+        enabled: root.enableAnimation
         NumberAnimation {
             duration: 300
             easing.type: Easing.OutCubic
+            from: (widgetMonitor.transform & 1 ? widgetMonitor.height : widgetMonitor.width) / 2
         }
     }
     Behavior on y {
+        enabled: root.enableAnimation
         NumberAnimation {
-            duration: 300
+            duration: 300 
             easing.type: Easing.OutCubic
+            from: (widgetMonitor.transform & 1 ? widgetMonitor.width : widgetMonitor.height) / 2
         }
     }
     Behavior on width {
+        enabled: root.enableAnimation
         NumberAnimation {
             duration: 300
             easing.type: Easing.OutCubic
+            from: root.width / 2
         }
     }
     Behavior on height {
+        enabled: root.enableAnimation
         NumberAnimation {
             duration: 300
             easing.type: Easing.OutCubic
+            from: root.height / 2
         }
     }
-
+ 
     // Rounded corners
     property real radius: Appearance.rounding.medium
 

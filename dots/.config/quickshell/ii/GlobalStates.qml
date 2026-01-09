@@ -61,7 +61,8 @@ Singleton {
     GlobalShortcut {
         name: "taskViewToggle"
         description: "Toggle task view"
-        onPressed: root.taskViewOpen = !root.taskViewOpen
+        onPressed: root.taskViewOpen = true
+        onReleased: root.taskViewOpen = false
     }
 
     IpcHandler {

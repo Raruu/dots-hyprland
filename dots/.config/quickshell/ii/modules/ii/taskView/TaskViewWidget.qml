@@ -187,16 +187,11 @@ Item {
         root.layoutMap = newLayout;
     }
 
-    // Helper to get active windows on current monitor & workspace
+    // Get all windows across all workspaces
     property var activeWindows: {
-        const activeWorkspaceId = monitor.activeWorkspace?.id;
-        if (!activeWorkspaceId)
-            return [];
-
         return ToplevelManager.toplevels.values.filter(toplevel => {
             const address = `0x${toplevel.HyprlandToplevel?.address}`;
-            const win = windowByAddress[address];
-            return win && win.workspace.id === activeWorkspaceId;
+            return windowByAddress[address] !== undefined;       
         });
     }
 
