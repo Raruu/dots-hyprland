@@ -18,16 +18,6 @@ Item { // Window
     property var monitorData
     property var scale
     property bool isShowing: true
-    property real widthRatio: {
-        const widgetWidth = widgetMonitor.transform & 1 ? widgetMonitor.height : widgetMonitor.width;
-        const monitorWidth = monitorData.transform & 1 ? monitorData.height : monitorData.width;
-        return (widgetWidth * monitorData.scale) / (monitorWidth * widgetMonitor.scale);
-    }
-    property real heightRatio: {
-        const widgetHeight = widgetMonitor.transform & 1 ? widgetMonitor.width : widgetMonitor.height;
-        const monitorHeight = monitorData.transform & 1 ? monitorData.width : monitorData.height;
-        return (widgetHeight * monitorData.scale) / (monitorHeight * widgetMonitor.scale);
-    }
 
     // Properties for smart packing layout
     property real targetX: 0
@@ -36,7 +26,6 @@ Item { // Window
     property real targetHeight: 0
 
     property var widgetMonitor
-    property int widgetMonitorId: widgetMonitor.id
 
     property bool hovered: false
     property bool pressed: false
