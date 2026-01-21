@@ -90,7 +90,7 @@ Item { // Window
         id: windowPreview
         anchors.fill: parent
         captureSource: root.isShowing ? root.toplevel : null
-        live: true
+        live: Config.options.taskView.livePreview
 
         // Color overlay for interactions
         Rectangle {

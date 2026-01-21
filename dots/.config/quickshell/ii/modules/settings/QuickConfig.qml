@@ -324,6 +324,15 @@ ContentPage {
             }
             
         }
+
+        ConfigSwitch {
+            buttonIcon: "browse_activity"
+            text: Translation.tr("Task View live preview")
+            checked: Config.options.taskView.livePreview
+            onCheckedChanged: {
+                Config.options.taskView.livePreview = checked;
+            }
+        }
     }
 
     NoticeBox {

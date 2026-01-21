@@ -93,7 +93,7 @@ Item { // Window
         id: windowPreview
         anchors.fill: parent
         captureSource: GlobalStates.overviewOpen ? root.toplevel : null
-        live: true
+        live: Config.options.taskView.livePreview
 
         // Color overlay for interactions
         Rectangle {
