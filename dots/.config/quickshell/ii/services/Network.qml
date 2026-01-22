@@ -36,7 +36,7 @@ Singleton {
     property int networkStrength
     property string materialSymbol: root.ethernet
     ? "lan"
-    : (root.wifi && root.networkName !== "")
+    : (root.wifiEnabled && root.networkName !== "")
     ? (
         Network.networkStrength > 83 ? "signal_wifi_4_bar" :
         Network.networkStrength > 67 ? "network_wifi" :
