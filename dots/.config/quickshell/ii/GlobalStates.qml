@@ -38,14 +38,6 @@ Singleton {
         }
     }
 
-    property real screenZoom: 1
-    onScreenZoomChanged: {
-        Quickshell.execDetached(["hyprctl", "keyword", "cursor:zoom_factor", root.screenZoom.toString()]);
-    }
-    Behavior on screenZoom {
-        animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-    }
-
     GlobalShortcut {
         name: "workspaceNumber"
         description: "Hold to show workspace numbers, release to show icons"
