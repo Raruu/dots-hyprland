@@ -116,8 +116,9 @@ Item {
                             item: modelData
                             Layout.fillHeight: !root.vertical
                             Layout.fillWidth: root.vertical
-                            onMenuClosed: root.releaseFocus();
-                            onMenuOpened: (qsWindow) => root.setExtraWindowAndGrabFocus(qsWindow);
+                            closeOverflowMenu: () => root.trayOverflowOpen = false                            
+                            onMenuClosed: root.releaseFocus()
+                            onMenuOpened: qsWindow => root.setExtraWindowAndGrabFocus(qsWindow)
                         }
                     }
                 }

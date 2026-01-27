@@ -12,21 +12,23 @@ MouseArea {
     id: root
     required property SystemTrayItem item
     property bool targetMenuOpen: false
+    property var closeOverflowMenu: () => {}
 
     signal menuOpened(qsWindow: var)
-    signal menuClosed()
+    signal menuClosed
 
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton | Qt.RightButton
     implicitWidth: 20
     implicitHeight: 20
-    onPressed: (event) => {
+    onPressed: event => {
         switch (event.button) {
         case Qt.LeftButton:
             item.activate();
             break;
         case Qt.RightButton:
-            if (item.hasMenu) menu.open();
+            if (item.hasMenu)
+                menu.open();
             break;
         }
         event.accepted = true;
@@ -42,7 +44,7 @@ MouseArea {
         }
         active: false
         sourceComponent: SysTrayMenu {
-            Component.onCompleted: this.open();
+            Component.onCompleted: this.open()
             trayItemMenuHandle: root.item.menu
             anchor {
                 window: root.QsWindow.window
@@ -53,10 +55,11 @@ MouseArea {
                 edges: Config.options.bar.bottom ? (Edges.Top | Edges.Left) : (Edges.Bottom | Edges.Right)
                 gravity: Config.options.bar.bottom ? (Edges.Top | Edges.Left) : (Edges.Bottom | Edges.Right)
             }
-            onMenuOpened: (window) => root.menuOpened(window);
+            onMenuOpened: window => root.menuOpened(window)
             onMenuClosed: {
                 root.menuClosed();
                 menu.active = false;
+                root.closeOverflowMenu();
             }
         }
     }
@@ -95,5 +98,4 @@ MouseArea {
         alternativeVisibleCondition: extraVisibleCondition
         anchorEdges: (!Config.options.bar.bottom && !Config.options.bar.vertical) ? Edges.Bottom : Edges.Top
     }
-
 }
