@@ -77,88 +77,90 @@ ContentPage {
                            path.endsWith('.ogv');
                 }
                 
-                StyledImage {
-                    id: wallpaperPreviewImage
-                    visible: !parent.isVideo
+                Loader {
+                    id: imageLoader
+                    active: !parent.isVideo
                     anchors.fill: parent
-                    sourceSize.width: parent.implicitWidth
-                    sourceSize.height: parent.implicitHeight
-                    fillMode: Image.PreserveAspectCrop
-                    source: parent.isVideo ? "" : Config.options.background.wallpaperPath
-                    cache: false
-                    layer.enabled: true
-                    layer.effect: OpacityMask {
-                        maskSource: Rectangle {
-                            width: 360
-                            height: 200
-                            radius: Appearance.rounding.normal
+                    sourceComponent: StyledImage {
+                        anchors.fill: parent
+                        sourceSize.width: 340
+                        sourceSize.height: 200
+                        fillMode: Image.PreserveAspectCrop
+                        source: Config.options.background.wallpaperPath
+                        cache: false
+                        layer.enabled: true
+                        layer.effect: OpacityMask {
+                            maskSource: Rectangle {
+                                width: 360
+                                height: 200
+                                radius: Appearance.rounding.normal
+                            }
                         }
                     }
                 }
                 
-                Rectangle {
-                    id: videoContainer
-                    visible: parent.isVideo
+                Loader {
+                    id: videoLoader
+                    active: parent.isVideo
                     anchors.fill: parent
-                    color: "transparent"
-                    
-                    VideoOutput {
-                        id: videoOutput
+                    sourceComponent: Rectangle {
+                        id: videoContainer
                         anchors.fill: parent
-                        fillMode: VideoOutput.PreserveAspectCrop
-                    }
-                    
-                    MediaPlayer {
-                        id: mediaPlayer
-                        source: videoContainer.visible ? Config.options.background.wallpaperPath : ""
-                        videoOutput: videoOutput
-                        audioOutput: AudioOutput {
-                            muted: true
-                        }
-                        loops: MediaPlayer.Infinite
-                        playbackRate: 1.0
+                        color: "transparent"
                         
-                        onPlaybackStateChanged: {
-                            if (playbackState === MediaPlayer.StoppedState && source !== "") {
-                                play();
+                        VideoOutput {
+                            id: videoOutput
+                            anchors.fill: parent
+                            fillMode: VideoOutput.PreserveAspectCrop
+                        }
+                        
+                        MediaPlayer {
+                            id: mediaPlayer
+                            source: Config.options.background.wallpaperPath
+                            videoOutput: videoOutput
+                            audioOutput: AudioOutput {
+                                muted: true
+                            }
+                            loops: MediaPlayer.Infinite
+                            playbackRate: 1.0
+                            
+                            onPlaybackStateChanged: {
+                                if (playbackState === MediaPlayer.StoppedState && source !== "") {
+                                    play();
+                                }
+                            }
+                            
+                            onSourceChanged: {
+                                if (source !== "") {
+                                    playTimer.restart();
+                                }
                             }
                         }
                         
-                        onSourceChanged: {
-                            if (source !== "" && videoContainer.visible) {
-                                // Small delay to ensure video output is ready
+                        Timer {
+                            id: playTimer
+                            interval: 100
+                            repeat: false
+                            onTriggered: {
+                                if (mediaPlayer.source !== "") {
+                                    mediaPlayer.play();
+                                }
+                            }
+                        }
+                        
+                        Component.onCompleted: {
+                            if (mediaPlayer.source !== "") {
                                 playTimer.restart();
                             }
                         }
-                    }
-                    
-                    Timer {
-                        id: playTimer
-                        interval: 100
-                        repeat: false
-                        onTriggered: {
-                            if (mediaPlayer.source !== "" && videoContainer.visible) {
-                                mediaPlayer.play();
+                        
+                        layer.enabled: true
+                        layer.effect: OpacityMask {
+                            maskSource: Rectangle {
+                                width: 360
+                                height: 200
+                                radius: Appearance.rounding.normal
                             }
-                        }
-                    }
-                    
-                    Timer {
-                        interval: 100
-                        running: videoContainer.visible
-                        onTriggered: {
-                            if (mediaPlayer.source !== "" && mediaPlayer.playbackState !== MediaPlayer.PlayingState) {
-                                mediaPlayer.play();
-                            }
-                        }
-                    }
-                    
-                    layer.enabled: true
-                    layer.effect: OpacityMask {
-                        maskSource: Rectangle {
-                            width: 360
-                            height: 200
-                            radius: Appearance.rounding.normal
                         }
                     }
                 }
