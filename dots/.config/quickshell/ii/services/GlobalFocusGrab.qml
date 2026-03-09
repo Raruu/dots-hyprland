@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import qs.modules.common
 
 /**
  * Manages a HyprlandFocusGrab that's to be shared by all windows.
@@ -63,7 +64,7 @@ Singleton {
     HyprlandFocusGrab {
         id: grab
         windows: root.dismissable.some(w => w.contentItem?.activeFocus) ? [...root.dismissable, ...root.persistent] : [...root.dismissable]
-        active: root.dismissable.length > 0
+        active: Config.options.interactions.focusGrab.enable && root.dismissable.length > 0
         onCleared: () => {
             root.dismiss();
         }

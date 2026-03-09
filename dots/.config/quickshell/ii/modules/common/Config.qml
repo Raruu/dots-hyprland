@@ -348,6 +348,9 @@ Singleton {
                 property JsonObject deadPixelWorkaround: JsonObject { // Hyprland leaves out 1 pixel on the right for interactions
                     property bool enable: false
                 }
+                property JsonObject focusGrab: JsonObject {
+                    property bool enable: true
+                }
             }
 
             property JsonObject language: JsonObject {

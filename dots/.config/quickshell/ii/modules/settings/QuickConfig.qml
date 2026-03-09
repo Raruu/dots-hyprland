@@ -412,6 +412,15 @@ ContentPage {
                 Config.options.taskView.livePreview = checked;
             }
         }
+
+        ConfigSwitch {
+            buttonIcon: "mouse"
+            text: Translation.tr("Focus grab")
+            checked: Config.options.interactions.focusGrab.enable
+            onCheckedChanged: {
+                Config.options.interactions.focusGrab.enable = checked;
+            }
+        }
     }
 
     NoticeBox {
